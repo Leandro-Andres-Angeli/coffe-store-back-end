@@ -1,12 +1,9 @@
 const { Schema, model } = require('mongoose');
 
-const CategorySchema = Schema({
+const CategorySchema = new Schema({
   category: { type: String, required: true },
   id: { type: String, required: true },
+  _id: 0,
 });
-/* CategorySchema.method('toJSON', function () {
-  const { _id, ...object } = this.toObject();
-  object.id = _id;
-  return object;
-}); */
+
 module.exports = model('Category', CategorySchema);
