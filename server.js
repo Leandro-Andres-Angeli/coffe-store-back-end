@@ -10,13 +10,14 @@ const {
 
 const { dbConnection } = require('./src/database/config');
 const Category = require('./src/models/Category');
-const remove_id = require('./utils/remove_id');
+const remove_id = require('./src/utils/remove_id');
+const { validateRequest, schema } = require('./src/middlewares/validation');
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 const env = require('dotenv').config();
 const { PORT } = env.parsed;
-console.log(PORT);
+
 server.use(cors());
 
 server.use(express.json());
@@ -24,6 +25,7 @@ server.use(express.json());
 server.get('/', (req, res) => {
   res.json({ ok: true });
 });
+//CATEGORIES
 server.get('/categories', async (req, res) => {
   try {
     const categories = await connectToCollection('categories');
@@ -38,6 +40,9 @@ server.get('/categories', async (req, res) => {
     return disconnectFromMongo();
   }
 });
+//CATEGORIES
+
+//USERS
 server.get('/users', async (req, res) => {
   try {
     const users = await connectToCollection('users');
@@ -50,7 +55,43 @@ server.get('/users', async (req, res) => {
     return disconnectFromMongo();
   }
 });
+//POST
+server.post('/users', validateRequest(schema), async (req, res) => {
+  const { name, lastName, email } = req.body;
+  console.log('req body', req.body);
+  console.log('post user');
+  return res.status(201).json({ ok: true });
+  // try {
+  //   const users = await connectToCollection('users');
+  //   const usersCollection = await users.find({}, remove_id()).toArray();
+
+  //   return res.status(200).json({ ok: true, users: usersCollection });
+  // } catch (err) {
+  //   return res.status(404).json({ err, ok: false });
+  // } finally {
+  //   return disconnectFromMongo();
+  // }
+});
+
+//USERS
+
+//PRODUCTS
+
+server.get('/products', async (req, res) => {
+  try {
+    const products = await connectToCollection('products');
+    const productsCollection = await products.find({}, remove_id()).toArray();
+
+    return res.status(200).json({ ok: true, products: productsCollection });
+  } catch (err) {
+    return res.status(404).json({ err, ok: false });
+  } finally {
+    return disconnectFromMongo();
+  }
+});
 
 server.listen(PORT, () => {
   console.log(`running on ${PORT}`);
 });
+
+//PRODUCTS
