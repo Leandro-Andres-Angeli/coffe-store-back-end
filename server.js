@@ -12,6 +12,7 @@ const { dbConnection } = require('./src/database/config');
 const Category = require('./src/models/Category');
 const remove_id = require('./src/utils/remove_id');
 const { validateRequest, schema } = require('./src/middlewares/validation');
+const User = require('./src/models/User');
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -57,10 +58,20 @@ server.get('/users', async (req, res) => {
 });
 //POST
 server.post('/users', validateRequest(schema), async (req, res) => {
-  const { name, lastName, email } = req.body;
-  console.log('req body', req.body);
-  console.log('post user');
-  return res.status(201).json({ ok: true });
+  const { name, lastName, email, password } = req.body;
+  try {
+    const users = await connectToCollection('users');
+    console.log('req body', req.body);
+    const newUser = new User({ name, lastName, email, password });
+    // const saveUserOperation = await newUser.save();
+    const insertNewUser = await users.insertOne(newUser);
+    console.log('saving ');
+    return res.status(201).json({ ok: true, message: 'user created' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  } finally {
+    return disconnectFromMongo();
+  }
   // try {
   //   const users = await connectToCollection('users');
   //   const usersCollection = await users.find({}, remove_id()).toArray();
