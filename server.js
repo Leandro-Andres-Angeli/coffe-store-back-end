@@ -65,7 +65,7 @@ server.post('/users', validateRequest(schema), async (req, res) => {
     const newUser = new User({ name, lastName, email, password });
     // const saveUserOperation = await newUser.save();
     const insertNewUser = await users.insertOne(newUser);
-    console.log('saving ');
+    console.log('saving ', insertNewUser);
     return res.status(201).json({ ok: true, message: 'user created' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
