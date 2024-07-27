@@ -62,10 +62,15 @@ server.post('/users', validateRequest(schema), async (req, res) => {
   try {
     const users = await connectToCollection('users');
     console.log('req body', req.body);
+    const checkIfDuplicateEmail = await users.findOne({ email });
+
+    if (checkIfDuplicateEmail) {
+      throw new Error('user with this email already exists');
+    }
     const newUser = new User({ name, lastName, email, password });
     // const saveUserOperation = await newUser.save();
     const insertNewUser = await users.insertOne(newUser);
-    console.log('saving ', insertNewUser);
+
     return res.status(201).json({ ok: true, message: 'user created' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
