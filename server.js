@@ -10,9 +10,14 @@ const {
 
 const { dbConnection } = require('./src/database/config');
 const Category = require('./src/models/Category');
+const bcrypt = require('bcryptjs');
 const remove_id = require('./src/utils/remove_id');
-const { validateRequest, schema } = require('./src/middlewares/validation');
+const {
+  validateUserCreate,
+  userCreateSchema,
+} = require('./src/middlewares/validation');
 const User = require('./src/models/User');
+const { generateToken } = require('./utils/generateToken');
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -57,37 +62,41 @@ server.get('/users', async (req, res) => {
   }
 });
 //POST
-server.post('/users', validateRequest(schema), async (req, res) => {
-  const { name, lastName, email, password } = req.body;
-  try {
-    const users = await connectToCollection('users');
-    console.log('req body', req.body);
-    const checkIfDuplicateEmail = await users.findOne({ email });
+server.post(
+  '/users',
+  validateUserCreate(userCreateSchema),
+  async (req, res) => {
+    const { name, lastName, email, password } = req.body;
+    try {
+      const users = await connectToCollection('users');
+      console.log('req body', req.body);
+      const user = await users.findOne({ email });
 
-    if (checkIfDuplicateEmail) {
-      throw new Error('user with this email already exists');
+      if (user) {
+        throw new Error('user with this email already exists');
+      }
+      const salt = bcrypt.genSaltSync();
+      const hashedPassword = bcrypt.hashSync(password, salt);
+      const newUser = new User({
+        name,
+        lastName,
+        email,
+        password: hashedPassword,
+      });
+
+      const insertUser = await users.insertOne(newUser);
+      // const token = await generateToken(user.id, name);
+      const insertedDocId = insertUser.insertedId.toString();
+      const token = await generateToken(insertedDocId, name);
+
+      return res.status(201).json({ ok: true, message: 'user created', token });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: err.message });
+    } finally {
+      return disconnectFromMongo();
     }
-    const newUser = new User({ name, lastName, email, password });
-    // const saveUserOperation = await newUser.save();
-    const insertNewUser = await users.insertOne(newUser);
-
-    return res.status(201).json({ ok: true, message: 'user created' });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  } finally {
-    return disconnectFromMongo();
   }
-  // try {
-  //   const users = await connectToCollection('users');
-  //   const usersCollection = await users.find({}, remove_id()).toArray();
-
-  //   return res.status(200).json({ ok: true, users: usersCollection });
-  // } catch (err) {
-  //   return res.status(404).json({ err, ok: false });
-  // } finally {
-  //   return disconnectFromMongo();
-  // }
-});
+);
 
 //USERS
 

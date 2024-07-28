@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const schema = Joi.object()
+const userCreateSchema = Joi.object()
   .keys({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
@@ -7,10 +7,12 @@ const schema = Joi.object()
     name: Joi.string().required(),
   })
   .options({ abortEarly: false });
-const validateRequest = (schema) => {
+const validateUserCreate = (schema) => {
   return (req, res, next) => {
     const validationResult = schema.validate(req.body);
-
+    if (!validationResult) {
+      return res.status(500).json({ ok: false, message: 'server error' });
+    }
     if (Boolean(validationResult.error)) {
       const {
         error: { details },
@@ -29,4 +31,8 @@ const validateRequest = (schema) => {
     next();
   };
 };
-module.exports = { validateRequest, schema };
+const userLoginSchema = Joi.object().keys({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+});
+module.exports = { validateUserCreate, userCreateSchema };
