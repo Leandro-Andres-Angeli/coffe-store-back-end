@@ -86,12 +86,23 @@ server.post(
 
       const insertUser = await users.insertOne(newUser);
       // const token = await generateToken(user.id, name);
+
       const insertedDocId = insertUser.insertedId.toString();
+
       const token = await generateToken(insertedDocId, name);
 
-      return res.status(201).json({ ok: true, message: 'user created', token });
+      return res.status(201).json({
+        ok: true,
+        user: { name: newUser.name, email: newUser.email, token },
+
+        message: 'user created',
+      });
     } catch (err) {
-      return res.status(500).json({ ok: false, error: err.message });
+      return res.status(500).json({
+        ok: false,
+
+        error: err.message,
+      });
     } finally {
       return disconnectFromMongo();
     }
@@ -110,6 +121,29 @@ server.get('/products', async (req, res) => {
     return res.status(200).json({ ok: true, products: productsCollection });
   } catch (err) {
     return res.status(404).json({ err, ok: false });
+  } finally {
+    return disconnectFromMongo();
+  }
+});
+
+server.get('/products/search', async (req, res) => {
+  // console.log(req.query);
+  const { category } = req.query;
+
+  try {
+    const products = await connectToCollection('products');
+    const categories = await connectToCollection('categories');
+    const getCategoryByQuery = await categories.findOne({ category });
+    console.log(getCategoryByQuery);
+
+    // console.log('ce', cat);
+    const productsCollection = await products
+      .find({ category: getCategoryByQuery.category }, remove_id())
+      .toArray();
+
+    return res.status(200).json({ ok: true, products: productsCollection });
+  } catch (err) {
+    return res.status(404).json({ err, ok: false, message: err.message });
   } finally {
     return disconnectFromMongo();
   }
