@@ -46,6 +46,24 @@ server.get('/categories', async (req, res) => {
     return disconnectFromMongo();
   }
 });
+
+//SEARCH LIKE
+server.get('/categories/search', async (req, res) => {
+  const { regex } = req.query;
+  try {
+    const categories = await connectToCollection('categories');
+    const categoriesCollection = await categories
+      .find({ category: { $regex: regex, $options: 'i' } }, remove_id())
+      .toArray();
+
+    return res.status(200).json({ ok: true, categories: categoriesCollection });
+  } catch (err) {
+    return res.status(404).json({ err, ok: false });
+  } finally {
+    return disconnectFromMongo();
+  }
+});
+//SEARCH LIKE
 //CATEGORIES
 
 //USERS
@@ -133,6 +151,7 @@ server.get('/products/search', async (req, res) => {
   try {
     const products = await connectToCollection('products');
     const categories = await connectToCollection('categories');
+
     const getCategoryByQuery = await categories.findOne({ category });
     console.log(getCategoryByQuery);
 
