@@ -18,6 +18,7 @@ const {
 } = require('./src/middlewares/validation');
 const User = require('./src/models/User');
 const { generateToken } = require('./utils/generateToken');
+const categoriesRouter = require('./src/routes/categories');
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -32,37 +33,39 @@ server.get('/', (req, res) => {
   res.json({ ok: true });
 });
 //CATEGORIES
-server.get('/categories', async (req, res) => {
-  try {
-    const categories = await connectToCollection('categories');
-    const categoriesCollection = await categories
-      .find({}, remove_id())
-      .toArray();
+server.use('/api/categories', categoriesRouter);
+// server.get('/categories', async (req, res) => {
+//   try {
+//     const categories = await connectToCollection('categories');
+//     const categoriesCollection = await categories
+//       .find({}, remove_id())
+//       .toArray();
 
-    return res.status(200).json({ ok: true, categories: categoriesCollection });
-  } catch (err) {
-    return res.status(404).json({ err, ok: false });
-  } finally {
-    return disconnectFromMongo();
-  }
-});
+//     return res.status(200).json({ ok: true, categories: categoriesCollection });
+//   } catch (err) {
+//     return res.status(404).json({ err, ok: false });
+//   } finally {
+//     return disconnectFromMongo();
+//   }
+// });
 
 //SEARCH LIKE
-server.get('/categories/search', async (req, res) => {
-  const { regex } = req.query;
-  try {
-    const categories = await connectToCollection('categories');
-    const categoriesCollection = await categories
-      .find({ category: { $regex: regex, $options: 'i' } }, remove_id())
-      .toArray();
 
-    return res.status(200).json({ ok: true, categories: categoriesCollection });
-  } catch (err) {
-    return res.status(404).json({ err, ok: false });
-  } finally {
-    return disconnectFromMongo();
-  }
-});
+// server.get('/categories/search', async (req, res) => {
+//   const { regex } = req.query;
+//   try {
+//     const categories = await connectToCollection('categories');
+//     const categoriesCollection = await categories
+//       .find({ category: { $regex: regex, $options: 'i' } }, remove_id())
+//       .toArray();
+
+//     return res.status(200).json({ ok: true, categories: categoriesCollection });
+//   } catch (err) {
+//     return res.status(404).json({ err, ok: false });
+//   } finally {
+//     return disconnectFromMongo();
+//   }
+// });
 //SEARCH LIKE
 //CATEGORIES
 

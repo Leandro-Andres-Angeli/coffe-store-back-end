@@ -31,7 +31,7 @@ const disconnectFromMongo = async () => {
     await client.close();
     console.log('disconnect');
   } catch (error) {
-    console.log(err.message);
+    console.log(error.message);
   }
 };
 
