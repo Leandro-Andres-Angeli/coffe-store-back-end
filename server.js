@@ -19,6 +19,7 @@ const {
 const User = require('./src/models/User');
 const { generateToken } = require('./utils/generateToken');
 const categoriesRouter = require('./src/routes/categories');
+const productsRouter = require('./src/routes/products');
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -34,6 +35,7 @@ server.get('/', (req, res) => {
 });
 //CATEGORIES
 server.use('/api/categories', categoriesRouter);
+server.use('/api/products', productsRouter);
 // server.get('/categories', async (req, res) => {
 //   try {
 //     const categories = await connectToCollection('categories');
