@@ -22,6 +22,7 @@ const getCategoriesByRegex = async (req, res) => {
   const { regex } = req.query;
   try {
     const categories = await connectToCollection('categories');
+
     const categoriesCollection = await categories
       .find({ category: { $regex: regex, $options: 'i' } }, remove_id())
       .toArray();

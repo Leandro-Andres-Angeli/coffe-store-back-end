@@ -136,7 +136,7 @@ server.post(
 
 //PRODUCTS
 
-server.get('/products', async (req, res) => {
+/* server.get('/products', async (req, res) => {
   try {
     const products = await connectToCollection('products');
     const productsCollection = await products.find({}, remove_id()).toArray();
@@ -147,10 +147,10 @@ server.get('/products', async (req, res) => {
   } finally {
     return disconnectFromMongo();
   }
-});
+}); */
 
-server.get('/products/search', async (req, res) => {
-  // console.log(req.query);
+/* server.get('/products/search', async (req, res) => {
+ 
   const { category } = req.query;
 
   try {
@@ -171,7 +171,7 @@ server.get('/products/search', async (req, res) => {
   } finally {
     return disconnectFromMongo();
   }
-});
+}); */
 
 server.listen(PORT, () => {
   console.log(`running on ${PORT}`);

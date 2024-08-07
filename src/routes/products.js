@@ -1,5 +1,8 @@
 const { Router } = require('express');
-const { getProducts } = require('../controllers/products');
+const {
+  getProducts,
+  getProductsByCategory,
+} = require('../controllers/products');
 
 const router = Router();
 /* router.get('/', function (req, res) {
@@ -10,6 +13,8 @@ const router = Router();
 }); */
 // get all products
 router.get('/', getProducts);
+router.get('/category', getProductsByCategory);
+
 // get all products
 
 module.exports = router;
