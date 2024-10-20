@@ -12,7 +12,7 @@ const generateToken = (uid, name) => {
       },
       (err, token) => {
         if (err) {
-          console.log('error generating toke');
+          console.log('error generating token');
           reject(err);
         }
         resolve(token);

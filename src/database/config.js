@@ -29,7 +29,6 @@ const connectToMongo = async () => {
 const disconnectFromMongo = async () => {
   try {
     await client.close();
-    console.log('disconnect');
   } catch (error) {
     console.log(error.message);
   }

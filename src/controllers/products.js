@@ -24,15 +24,31 @@ const getProducts = async (req, res) => {
 };
 const getProductsByCategory = async (req, res) => {
   const { category } = req.query;
-  console.log(category);
+  const page = Number(req.query.page);
+  const resultsPerPage = 3;
+  let prev = false;
+
+  let next = false;
+  if (page !== 0) {
+    prev = true;
+  }
   try {
     const products = await connectToCollection('products');
     const productsCollection = await products
       .find({ category }, remove_id())
-      .limit(10)
+      .sort({ name: 1 })
+      .skip(page * 5)
+      //pagination trick
+      .limit(resultsPerPage + 1)
+      //pagination trick
       .toArray();
-
-    return res.status(200).json({ ok: true, products: productsCollection });
+    if (productsCollection.length > resultsPerPage) {
+      next = true;
+      productsCollection.pop();
+    }
+    return res
+      .status(200)
+      .json({ ok: true, prev, next, products: productsCollection });
   } catch (err) {
     return res.status(404).json({ error: err.message, ok: false });
   } finally {
