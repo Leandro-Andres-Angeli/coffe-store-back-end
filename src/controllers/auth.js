@@ -59,12 +59,17 @@ const loginUser = async (req, res) => {
       return res.status(403).json({ ok: false, message: 'auth error' });
     }
     const validPassword = bcrypt.compareSync(password, user.password);
-    console.log(user);
-    console.log(validPassword);
+
     if (!validPassword) {
       return res.status(403).json({ ok: false, message: 'auth error' });
     }
-    return res.status(200).json({ ok: true, message: 'login route' });
+    const { password: userPassword, ...restOfUser } = user;
+
+    const token = await generateToken(restOfUser);
+
+    return res
+      .status(200)
+      .json({ ok: true, message: 'login succesful', token });
   } catch (error) {
     console.log(error);
   } finally {
