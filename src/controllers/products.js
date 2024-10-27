@@ -17,7 +17,7 @@ const getProducts = async (req, res) => {
 
     return res.status(200).json({ ok: true, products: productsCollection });
   } catch (err) {
-    return res.status(404).json({ error: err.message, ok: false });
+    return res.status(404).json({ message: err.message, ok: false });
   } finally {
     return disconnectFromMongo();
   }
@@ -50,7 +50,7 @@ const getProductsByCategory = async (req, res) => {
       .status(200)
       .json({ ok: true, prev, next, products: productsCollection });
   } catch (err) {
-    return res.status(404).json({ error: err.message, ok: false });
+    return res.status(404).json({ message: err.message, ok: false });
   } finally {
     return disconnectFromMongo();
   }

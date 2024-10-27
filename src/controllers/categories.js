@@ -13,7 +13,7 @@ const getCategories = async (req, res) => {
 
     return res.status(200).json({ ok: true, categories: categoriesCollection });
   } catch (err) {
-    return res.status(404).json({ error: err.message, ok: false });
+    return res.status(404).json({ nessage: err.message, ok: false });
   } finally {
     return disconnectFromMongo();
   }

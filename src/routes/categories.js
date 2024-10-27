@@ -1,9 +1,5 @@
 const { Router } = require('express');
-const {
-  connectToCollection,
-  disconnectFromMongo,
-} = require('../database/config');
-const remove_id = require('../utils/remove_id');
+
 const {
   getCategories,
   getCategoriesByRegex,
