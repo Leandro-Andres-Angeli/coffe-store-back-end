@@ -67,7 +67,7 @@ const loginUser = async function (req, res) {
       }
       req.login(user, { session: false }, (err) => {
         if (err) {
-          res.send(err);
+          return res.send(err);
         }
         const { password, _id: id, ...userWithoutPassword } = user;
         return res.json({

@@ -67,14 +67,17 @@ passport.use(
         const users = await connectToCollection('users');
 
         const user = await users.findOne({ email });
+        if (!user) {
+          return cb(null, null, { message: 'login error ' });
+        }
         const comparePasswordHashed = bcrypt.compareSync(
           password,
           user.password
         );
         console.log(comparePasswordHashed);
 
-        if (!user || !comparePasswordHashed) {
-          return cb(null, false, { message: 'login error' });
+        if (!comparePasswordHashed) {
+          return cb(null, null, { message: 'login error ' });
         }
 
         return cb(null, user, { message: 'user found' });
@@ -110,8 +113,6 @@ server.use(passport.initialize());
 
 const env = require('dotenv').config();
 const { PORT } = env.parsed;
-
-server.use(cors());
 
 server.use(express.json());
 
