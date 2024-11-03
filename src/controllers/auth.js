@@ -56,22 +56,25 @@ const loginUser = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(403).json({ ok: false, message: 'auth error' });
+      return res.status(404).json({ ok: true, message: 'auth error' });
     }
     const validPassword = bcrypt.compareSync(password, user.password);
 
     if (!validPassword) {
-      return res.status(403).json({ ok: false, message: 'auth error' });
+      return res.status(404).json({ ok: true, message: 'auth error' });
     }
     const { password: userPassword, ...restOfUser } = user;
 
     const token = await generateToken(restOfUser);
 
-    return res
-      .status(200)
-      .json({ ok: true, message: 'login succesful', token });
+    return res.status(200).json({
+      ok: true,
+      message: 'login succesful',
+      user: { restOfUser },
+      token,
+    });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ ok: false, message: 'error de servidor' });
   } finally {
     return disconnectFromMongo();
   }
