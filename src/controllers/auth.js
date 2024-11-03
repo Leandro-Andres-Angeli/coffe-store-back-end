@@ -63,14 +63,14 @@ const loginUser = async (req, res) => {
     if (!validPassword) {
       return res.status(404).json({ ok: true, message: 'auth error' });
     }
-    const { password: userPassword, ...restOfUser } = user;
+    const { password: userPassword, _id: id, ...restOfUser } = user;
 
     const token = await generateToken(restOfUser);
 
     return res.status(200).json({
       ok: true,
       message: 'login succesful',
-      user: { restOfUser },
+      user: { id, ...restOfUser },
       token,
     });
   } catch (error) {
