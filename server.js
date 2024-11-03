@@ -8,107 +8,21 @@ const {
   disconnectFromMongo,
 } = require('./src/database/config');
 
-const bcrypt = require('bcryptjs');
 const remove_id = require('./src/utils/remove_id');
-const {
-  validateUserCreate,
-  userCreateSchema,
-} = require('./src/middlewares/validation');
 
-const { generateToken } = require('./utils/generateToken');
 const categoriesRouter = require('./src/routes/categories');
 const productsRouter = require('./src/routes/products');
 const authRouter = require('./src/routes/auth');
 const passport = require('passport');
-const { handleLogin } = require('./src/config/passport');
-const LocalStrategy = require('passport-local').Strategy;
+const { passportLocalStrategy } = require('./src/config/passport');
+
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cors());
-/* passport.use(handleLogin); */
-/* passport.use(
-  new LocalStrategy(
-    {
-      usernameField: 'email',
-      passwordField: 'password',
-    },
-    async function (email = 'user@gmail.com', password, cb) {
-      try {
-        console.log(email);
 
-        const users = await connectToCollection('users');
+passport.use(passportLocalStrategy);
 
-        return users.findOne({ email }).then((user) => {
-          if (!user) {
-            return cb(null, false, {
-              message: 'Incorrect email or password.',
-            });
-          }
-
-          return cb(null, user, {
-            message: 'Logged In Successfully',
-          });
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  )
-); */
-passport.use(
-  new LocalStrategy(
-    {
-      usernameField: 'email',
-      passwordField: 'password',
-    },
-    async function (email, password, cb) {
-      try {
-        const users = await connectToCollection('users');
-
-        const user = await users.findOne({ email });
-        if (!user) {
-          return cb(null, null, { message: 'login error ' });
-        }
-        const comparePasswordHashed = bcrypt.compareSync(
-          password,
-          user.password
-        );
-        console.log(comparePasswordHashed);
-
-        if (!comparePasswordHashed) {
-          return cb(null, null, { message: 'login error ' });
-        }
-
-        return cb(null, user, { message: 'user found' });
-      } catch (error) {
-        console.log('in error');
-
-        console.log(error);
-      }
-    }
-  )
-);
-
-/* passport.use(
-  new LocalStrategy(
-    { usernameField: 'username', passwordField: 'password' },
-    function (username = 'user@gmail.com', password, cb) {
-      const users = connectToCollection('users');
-      const user = users.findOne({
-        email: username,
-      });
-      if (err) {
-        console.log('in error');
-
-        return cb(err);
-      }
-
-      console.log(user);
-      return user;
-    }
-  )
-); */
 server.use(passport.initialize());
 
 const env = require('dotenv').config();
