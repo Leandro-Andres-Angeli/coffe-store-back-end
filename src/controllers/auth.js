@@ -1,4 +1,6 @@
+const passport = require('passport');
 const { generateToken } = require('../../utils/generateToken');
+const { handleLogin } = require('../config/passport');
 const {
   connectToCollection,
   disconnectFromMongo,
@@ -46,7 +48,50 @@ const postUser = async (req, res) => {
     return disconnectFromMongo();
   }
 };
-const loginUser = async (req, res) => {
+const loginUser = function (req, res) {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    console.log('user', user);
+    if (err || !user) {
+      return res.status(400).json({
+        message: info ? info.message : 'Login failed',
+        user: user,
+      });
+    }
+    console.log('in');
+
+    req.login(user, { session: false }, (err) => {
+      if (err) {
+        res.send(err);
+      }
+
+      return res.json({ user });
+    });
+  })(req, res);
+};
+/* const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    passport.authenticate(
+      'local',
+      { session: false },
+      function (err, user, info) {
+        console.log(user);
+        console.log('in');
+      }
+    );
+    return res.status(200).json({
+      ok: true,
+      message: 'login',
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({ ok: false, message: 'error de servidor' });
+  } finally {
+    return disconnectFromMongo();
+  }
+}; */
+/* const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -78,5 +123,5 @@ const loginUser = async (req, res) => {
   } finally {
     return disconnectFromMongo();
   }
-};
+}; */
 module.exports = { postUser, loginUser };

@@ -6,5 +6,6 @@ const {
 } = require('../middlewares/validation');
 const router = Router();
 router.post('/newUser', validateUserCreate(userCreateSchema), postUser);
+/* router.post('/', loginUser); */
 router.post('/', loginUser);
 module.exports = router;
