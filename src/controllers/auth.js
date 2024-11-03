@@ -48,25 +48,36 @@ const postUser = async (req, res) => {
     return disconnectFromMongo();
   }
 };
-const loginUser = function (req, res) {
-  passport.authenticate('local', { session: false }, (err, user, info) => {
-    console.log('user', user);
-    if (err || !user) {
-      return res.status(400).json({
-        message: info ? info.message : 'Login failed',
-        user: user,
+const loginUser = async function (req, res) {
+  passport.authenticate(
+    'local',
+    { session: false },
+    async (err, user, info) => {
+      if (err || !user) {
+        return res.status(400).json({
+          message: info ? info.message : 'Login failed',
+          user: user,
+        });
+      }
+      let token;
+      try {
+        token = await generateToken(user);
+      } catch (error) {
+        return res.status(500).json({ ok: false, message: 'auth error' });
+      }
+      req.login(user, { session: false }, (err) => {
+        if (err) {
+          res.send(err);
+        }
+        const { password, _id: id, ...userWithoutPassword } = user;
+        return res.json({
+          ok: true,
+          user: { id, ...userWithoutPassword },
+          token,
+        });
       });
     }
-    console.log('in');
-
-    req.login(user, { session: false }, (err) => {
-      if (err) {
-        res.send(err);
-      }
-
-      return res.json({ user });
-    });
-  })(req, res);
+  )(req, res);
 };
 /* const loginUser = async (req, res) => {
   try {

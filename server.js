@@ -67,12 +67,17 @@ passport.use(
         const users = await connectToCollection('users');
 
         const user = await users.findOne({ email });
-        if (!user) {
-          console.log('not user');
+        const comparePasswordHashed = bcrypt.compareSync(
+          password,
+          user.password
+        );
+        console.log(comparePasswordHashed);
 
-          return cb(null, false, { message: 'not user' });
+        if (!user || !comparePasswordHashed) {
+          return cb(null, false, { message: 'login error' });
         }
-        return cb(null, user, { message: 'found' });
+
+        return cb(null, user, { message: 'user found' });
       } catch (error) {
         console.log('in error');
 
