@@ -62,7 +62,7 @@ const getProductsByRegex = async (req, res) => {
       .find({ name: { $regex: req.query.name, $options: 'i' } }, remove_id())
       .toArray();
     console.log(productsSearch);
-    return res.status(200).json({ ok: true, message: 'search' });
+    return res.status(200).json({ ok: true, data: productsSearch });
   } catch (error) {
     return res.status(500).json({ ok: false, message: 'error de servidor' });
   }
