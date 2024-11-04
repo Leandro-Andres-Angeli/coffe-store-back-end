@@ -2,6 +2,7 @@ const { Router } = require('express');
 const {
   getProducts,
   getProductsByCategory,
+  getProductsByRegex,
 } = require('../controllers/products');
 
 const router = Router();
@@ -14,6 +15,7 @@ const router = Router();
 // get all products
 router.get('/', getProducts);
 router.get('/category', getProductsByCategory);
+router.get('/search', getProductsByRegex);
 
 // get all products
 

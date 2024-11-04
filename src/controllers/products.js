@@ -55,5 +55,16 @@ const getProductsByCategory = async (req, res) => {
     return disconnectFromMongo();
   }
 };
-
-module.exports = { getProducts, getProductsByCategory };
+const getProductsByRegex = async (req, res) => {
+  try {
+    const products = await connectToCollection('products');
+    const productsSearch = await products
+      .find({ name: { $regex: req.query.name, $options: 'i' } }, remove_id())
+      .toArray();
+    console.log(productsSearch);
+    return res.status(200).json({ ok: true, message: 'search' });
+  } catch (error) {
+    return res.status(500).json({ ok: false, message: 'error de servidor' });
+  }
+};
+module.exports = { getProducts, getProductsByCategory, getProductsByRegex };
