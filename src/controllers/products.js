@@ -56,14 +56,35 @@ const getProductsByCategory = async (req, res) => {
   }
 };
 const getProductsByRegex = async (req, res) => {
+  const page = Number(req.query.page);
+  const resultsPerPage = 3;
+  let prev = false;
+
+  let next = false;
+  if (page !== 0) {
+    prev = true;
+  }
   try {
     const products = await connectToCollection('products');
     const productsSearch = await products
       .find({ name: { $regex: req.query.name, $options: 'i' } }, remove_id())
+      .sort({ name: 1 })
+      .skip(page * 5)
+      //pagination trick
+      .limit(resultsPerPage + 1)
+      //pagination trick
       .toArray();
-    console.log(productsSearch);
-    return res.status(200).json({ ok: true, data: productsSearch });
+    if (productsSearch.length > resultsPerPage) {
+      next = true;
+      productsSearch.pop();
+    }
+    return res
+      .status(200)
+      .json({ ok: true, next, prev, products: productsSearch });
   } catch (error) {
+    console.log('in error');
+    console.log(error);
+
     return res.status(500).json({ ok: false, message: 'error de servidor' });
   }
 };
