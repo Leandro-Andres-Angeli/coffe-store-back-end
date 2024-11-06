@@ -15,7 +15,6 @@ exports.passportLocalStrategy = new LocalStrategy(
         return cb(null, null, { message: 'login error ' });
       }
       const comparePasswordHashed = bcrypt.compareSync(password, user.password);
-      console.log(comparePasswordHashed);
 
       if (!comparePasswordHashed) {
         return cb(null, null, { message: 'login error ' });

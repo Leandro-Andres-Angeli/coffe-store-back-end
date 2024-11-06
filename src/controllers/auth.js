@@ -10,7 +10,7 @@ const postUser = async (req, res) => {
   const { name, lastName, email, password } = req.body;
   try {
     const users = await connectToCollection('users');
-    console.log('req body', req.body);
+
     const user = await users.findOne({ email });
 
     if (user) {
@@ -23,12 +23,11 @@ const postUser = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
+      favorites: [],
     };
 
     const insertUser = await users.insertOne(newUser);
     // const token = await generateToken(user.id, name);
-
-    const insertedDocId = insertUser.insertedId.toString();
 
     /*   const token = await generateToken(insertedDocId, name); */
 

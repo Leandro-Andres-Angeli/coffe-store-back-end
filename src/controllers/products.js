@@ -69,7 +69,7 @@ const getProductsByRegex = async (req, res) => {
     const productsSearch = await products
       .find({ name: { $regex: req.query.name, $options: 'i' } }, remove_id())
       .sort({ name: 1 })
-      .skip(page * 5)
+      .skip(page * 3)
       //pagination trick
       .limit(resultsPerPage + 1)
       //pagination trick
