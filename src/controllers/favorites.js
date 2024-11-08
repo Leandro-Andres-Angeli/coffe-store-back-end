@@ -15,13 +15,19 @@ const pushProducts = async (req, res) => {
     const product = req.body;
 
     const users = await connectToCollection('users');
-    const userUpdateFavs = await users.findOneAndUpdate(
+    /*  const userUpdateFavs = await users.findOneAndUpdate(
       {
         _id: new ObjectId(userId),
       },
       { $push: { favorites: req.body } }
+    ); */
+    const userUpdateFavs = await users.findOneAndUpdate(
+      {
+        _id: new ObjectId(userId),
+      },
+      { $pull: { favorites: { id: 'COF029' } } }
     );
-
+    /*  COF029 */
     console.log(userUpdateFavs);
 
     return res.status(200).json({ ok: true, message: 'push' });
