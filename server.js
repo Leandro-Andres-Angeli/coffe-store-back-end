@@ -15,6 +15,7 @@ const productsRouter = require('./src/routes/products');
 const authRouter = require('./src/routes/auth');
 const passport = require('passport');
 const { passportLocalStrategy } = require('./src/config/passport');
+const favoritesRouter = require('./src/routes/favorites');
 
 const server = express();
 server.use(express.json());
@@ -36,6 +37,7 @@ server.get('/', (req, res) => {
 
 server.use('/api/categories', categoriesRouter);
 server.use('/api/products', productsRouter);
+server.use('/api/favorites', favoritesRouter);
 server.use('/api/auth', authRouter);
 
 //USERS
