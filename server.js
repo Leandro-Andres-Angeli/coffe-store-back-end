@@ -23,7 +23,7 @@ const {
 const favoritesRouter = require('./src/routes/favorites');
 
 const { ExtractJwt } = require('passport-jwt');
-const { header } = require('express-validator');
+const { header, validationResult } = require('express-validator');
 const { validateFields } = require('./src/validations/validateFields');
 
 const server = express();
@@ -82,8 +82,17 @@ server.use('/api/auth', authRouter);
 server.post(
   '/api/testauth',
   [
-    header('Authorization').notEmpty().withMessage('no auth token present'),
-    validateFields,
+    header('Authorization').notEmpty().withMessage('not authorized'),
+    function (req, res, next) {
+      const result = validationResult(req);
+      if (result.errors.length !== 0) {
+        return res
+          .status(401)
+          .json({ ok: false, message: result.errors[0].msg });
+      }
+
+      return next();
+    },
   ],
   function (req, res, next) {
     passport.authenticate(
