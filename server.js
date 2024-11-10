@@ -10,7 +10,7 @@ const {
 
 const remove_id = require('./src/utils/remove_id');
 /* const JWTStrategy = require('passport-jwt').Strategy; */
-const { ObjectId } = require('mongodb');
+
 const JwtStrategy = require('passport-jwt').Strategy;
 const categoriesRouter = require('./src/routes/categories');
 const productsRouter = require('./src/routes/products');
@@ -32,7 +32,8 @@ server.use(express.urlencoded({ extended: true }));
 server.use(cors());
 
 passport.use(passportLocalStrategy);
-passport.use(
+passport.use(passportJWTStrategy);
+/* passport.use(
   new JwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -40,11 +41,10 @@ passport.use(
     },
     async function (jwt_payload, cb) {
       try {
-        console.log(arguments);
         const users = await connectToCollection('users');
         const { _id: id } = jwt_payload;
 
-        /* 672ac1c5269e19ede8d4d740 */
+        // 672ac1c5269e19ede8d4d740
         const foundUser = await users.findOne(
           {
             _id: new ObjectId(id),
@@ -64,7 +64,7 @@ passport.use(
       }
     }
   )
-);
+); */
 server.use(passport.initialize());
 const env = require('dotenv').config();
 const { PORT } = env.parsed;

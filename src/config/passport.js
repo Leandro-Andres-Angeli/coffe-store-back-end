@@ -1,6 +1,11 @@
 const bcrypt = require('bcryptjs');
-const { connectToCollection } = require('../database/config');
+const {
+  connectToCollection,
+  disconnectFromMongo,
+} = require('../database/config');
+const { ObjectId } = require('mongodb');
 const { ExtractJwt } = require('passport-jwt');
+const remove_id = require('../utils/remove_id');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTStrategy = require('passport-jwt').Strategy;
 exports.passportJWTStrategy = new JWTStrategy(
@@ -8,68 +13,33 @@ exports.passportJWTStrategy = new JWTStrategy(
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.SECRET_JWT_SEED,
   },
-  function (jwt_payload, cb) {
-    console.log('JWT', jwt_payload);
-  }
-);
-/* exports.passportJWTStrategy = new JWTStrategy(
-  {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.SECRET_JWT_SEED,
-  },
-  async function (JWTPayload, cb) {
+  async function (jwt_payload, cb) {
     try {
-      console.log('JWT', JWTPayload.id);
-      if (JWTPayload === null) {
-        console.log('no token');
+      const users = await connectToCollection('users');
+      const { _id: id } = jwt_payload;
 
-        return cb(new Error('authentication error', false));
+      /* 672ac1c5269e19ede8d4d740 */
+      const foundUser = await users.findOne(
+        {
+          _id: new ObjectId(id),
+        },
+        remove_id()
+      );
+      if (!foundUser) {
+        return cb(null, false, { message: 'auth error' });
       }
-      const user = {
-        id: '672ac1c5269e19ede8d4d940',
-        name: 456,
-        lastName: 'user',
-        email: 'user@gmail.com',
-        favorites: [
-          {
-            id: 'COF009',
-            name: 'Americano',
-            description: 'Espresso shots diluted with hot water.',
-            category: 'Coffee',
-            price: 3.25,
-          },
-          {
-            id: 'COF011',
-            name: 'Affogato',
-            description:
-              'Vanilla gelato or ice cream drowned in a shot of hot espresso.',
-            category: 'Coffee',
-            price: 5.5,
-          },
-          {
-            id: 'COF026',
-            name: 'Café au Lait',
-            description:
-              'French-style coffee with equal parts coffee and steamed milk.',
-            category: 'Coffee',
-            price: 4,
-          },
-          {
-            id: 'COF004',
-            name: 'Cortado',
-            description: 'Equal parts espresso and steamed milk.',
-            category: 'Coffee',
-            price: 3.75,
-          },
-        ],
-      };
-      cb(null, user);
+      return cb(null, foundUser);
     } catch (error) {
-    
-      return cb(error, false);
+      console.log('err', error);
+      return cb(null, false, {
+        message: 'server error',
+      });
+    } finally {
+      disconnectFromMongo();
     }
   }
-); */
+);
+
 exports.passportLocalStrategy = new LocalStrategy(
   {
     usernameField: 'email',
