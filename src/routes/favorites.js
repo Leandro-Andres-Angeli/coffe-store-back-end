@@ -7,7 +7,7 @@ const { pushProducts } = require('../controllers/favorites');
 const router = Router();
 
 // get all products
-router.post('/add', pushProducts);
+router.post('', pushProducts);
 
 // get all products
 

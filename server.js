@@ -22,6 +22,7 @@ const favoritesRouter = require('./src/routes/favorites');
 
 const { header, validationResult } = require('express-validator');
 const validateThereIsToken = require('./src/validations/validateThereIsToken');
+const { authenticateUser } = require('./src/controllers/auth');
 
 const server = express();
 server.use(express.json());
@@ -43,27 +44,18 @@ server.get('/', (req, res) => {
 
 server.use('/api/categories', categoriesRouter);
 server.use('/api/products', productsRouter);
-server.use('/api/favorites', validateThereIsToken, favoritesRouter);
+server.use(
+  '/api/favorites',
+  validateThereIsToken,
+  authenticateUser,
+  favoritesRouter
+);
 server.use('/api/auth', authRouter);
 server.post(
   '/api/testauth',
 
   validateThereIsToken,
-  function (req, res, next) {
-    passport.authenticate(
-      'jwt',
-      { session: false },
-      function (err, user, info) {
-        if (!user || err) {
-          return res
-            .status(401)
-            .json({ ok: false, message: info.message || 'error' });
-        }
-
-        return next();
-      }
-    )(req, res, next);
-  },
+  authenticateUser,
   function (req, res) {
     try {
       res.send({ ok: 'next' });

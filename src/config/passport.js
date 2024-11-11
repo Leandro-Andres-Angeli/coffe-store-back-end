@@ -26,15 +26,14 @@ exports.passportJWTStrategy = new JWTStrategy(
       );
       if (!foundUser) {
         return cb(null, false, { message: 'auth error' });
+      } else {
       }
-      return cb(null, foundUser);
+      return cb(null, { id, ...foundUser });
     } catch (error) {
       console.log('err', error);
       return cb(null, false, {
         message: 'server error',
       });
-    } finally {
-      disconnectFromMongo();
     }
   }
 );

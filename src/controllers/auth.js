@@ -26,10 +26,7 @@ const postUser = async (req, res) => {
       favorites: [],
     };
 
-    const insertUser = await users.insertOne(newUser);
-    // const token = await generateToken(user.id, name);
-
-    /*   const token = await generateToken(insertedDocId, name); */
+    await users.insertOne(newUser);
 
     return res.status(201).json({
       ok: true,
@@ -69,6 +66,7 @@ const loginUser = async function (req, res) {
           return res.send(err);
         }
         const { password, _id: id, ...userWithoutPassword } = user;
+
         return res.json({
           ok: true,
           user: { id, ...userWithoutPassword },
@@ -78,5 +76,15 @@ const loginUser = async function (req, res) {
     }
   )(req, res);
 };
-
-module.exports = { postUser, loginUser };
+const authenticateUser = function (req, res, next) {
+  passport.authenticate('jwt', { session: false }, function (err, user, info) {
+    if (!user || err) {
+      return res
+        .status(401)
+        .json({ ok: false, message: info.message || 'error' });
+    }
+    req.user = user;
+    return next();
+  })(req, res, next);
+};
+module.exports = { postUser, loginUser, authenticateUser };

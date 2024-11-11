@@ -1,15 +1,14 @@
-const {
-  connectToCollection,
-  disconnectFromMongo,
-} = require('../database/config');
+const { connectToCollection } = require('../database/config');
 const { ObjectId } = require('mongodb');
-const remove_id = require('../utils/remove_id');
+
 const crudFavorites = require('../../utils/crudFavorites');
 
 const pushProducts = async (req, res) => {
   try {
     /* 672ac1c5269e19ede8d4d940 */
-    const { userId, action } = req.query;
+    const userId = req.user.id;
+
+    const { action } = req.query;
 
     const product = req.body;
 
@@ -19,7 +18,7 @@ const pushProducts = async (req, res) => {
       {
         _id: new ObjectId(userId),
       },
-      /*  { $pull: { favorites: { id: product.id } } } */
+
       crudFavorites[action](product)
     );
 
