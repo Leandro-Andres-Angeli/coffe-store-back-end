@@ -18,7 +18,6 @@ exports.passportJWTStrategy = new JWTStrategy(
       const users = await connectToCollection('users');
       const { _id: id } = jwt_payload;
 
-      /* 672ac1c5269e19ede8d4d740 */
       const foundUser = await users.findOne(
         {
           _id: new ObjectId(id),
