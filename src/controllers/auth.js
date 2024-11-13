@@ -1,6 +1,6 @@
 const passport = require('passport');
 const { generateToken } = require('../../utils/generateToken');
-const { handleLogin } = require('../config/passport');
+
 const {
   connectToCollection,
   disconnectFromMongo,
@@ -24,6 +24,7 @@ const postUser = async (req, res) => {
       email,
       password: hashedPassword,
       favorites: [],
+      avatar: '',
     };
 
     await users.insertOne(newUser);
@@ -48,7 +49,7 @@ const loginUser = async function (req, res) {
   passport.authenticate(
     'local',
     { session: false },
-    async (err, user, info) => {
+    async function (err, user, info) {
       if (err || !user) {
         return res.status(400).json({
           message: info ? info.message : 'Login failed',
@@ -59,7 +60,9 @@ const loginUser = async function (req, res) {
       try {
         token = await generateToken(user);
       } catch (error) {
-        return res.status(500).json({ ok: false, message: 'auth error' });
+        return res
+          .status(500)
+          .json({ ok: false, message: error.message || 'auth error' });
       }
       req.login(user, { session: false }, (err) => {
         if (err) {

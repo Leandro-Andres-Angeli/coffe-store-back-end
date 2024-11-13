@@ -30,7 +30,6 @@ exports.passportJWTStrategy = new JWTStrategy(
       }
       return cb(null, { id, ...foundUser });
     } catch (error) {
-      console.log('err', error);
       return cb(null, false, {
         message: 'server error',
       });
@@ -50,7 +49,13 @@ exports.passportLocalStrategy = new LocalStrategy(
       const user = await users.findOne({ email });
 
       if (!user) {
-        return cb(null, null, { message: ' ' });
+        return cb(null, null, { message: 'login error' });
+      }
+      if (user.hasOwnProperty('googleId')) {
+        return cb(null, false, {
+          message:
+            'user with this email already linked to google use google login',
+        });
       }
       const comparePasswordHashed = bcrypt.compareSync(password, user.password);
 

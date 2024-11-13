@@ -18,14 +18,16 @@ const {
   passportLocalStrategy,
   passportJWTStrategy,
 } = require('./src/config/passport');
+
 const favoritesRouter = require('./src/routes/favorites');
 
 const { header, validationResult } = require('express-validator');
 const validateThereIsToken = require('./src/validations/validateThereIsToken');
 const { authenticateUser } = require('./src/controllers/auth');
+const userRoutes = require('./src/routes/users');
 
 const server = express();
-server.use(express.json());
+server.use(express.json({ limit: '50mb' }));
 server.use(express.urlencoded({ extended: true }));
 server.use(cors());
 
@@ -51,22 +53,9 @@ server.use(
   favoritesRouter
 );
 server.use('/api/auth', authRouter);
-server.post(
-  '/api/testauth',
-
-  validateThereIsToken,
-  authenticateUser,
-  function (req, res) {
-    try {
-      res.send({ ok: 'next' });
-    } catch (error) {
-      console.log('in error');
-      res.status(500).json({ ok: false, message: error.message });
-    }
-  }
-);
-
+server.use('/api/users', userRoutes);
 //USERS
+
 server.get('/users', async (req, res) => {
   try {
     const users = await connectToCollection('users');
