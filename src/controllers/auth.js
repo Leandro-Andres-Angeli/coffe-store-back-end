@@ -58,7 +58,8 @@ const loginUser = async function (req, res) {
       }
       let token;
       try {
-        token = await generateToken(user);
+        const { password, ...userWithoutPassword } = user;
+        token = await generateToken(userWithoutPassword);
       } catch (error) {
         return res
           .status(500)
