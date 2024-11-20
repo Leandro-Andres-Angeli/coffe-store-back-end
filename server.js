@@ -35,8 +35,8 @@ passport.use(passportLocalStrategy);
 passport.use(passportJWTStrategy);
 
 server.use(passport.initialize());
-const env = require('dotenv').config();
-const { PORT } = env.parsed;
+
+const PORT = process.env.PORT;
 
 server.use(express.json());
 
