@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
-
-const { CONNECTION_STRING, DB_NAME } = require('dotenv').config().parsed;
+require('dotenv').config();
+const { CONNECTION_STRING, DB_NAME } = process.env;
 
 // CONECTING KEPT OPEN
 /* const dbConnection = async () => {
