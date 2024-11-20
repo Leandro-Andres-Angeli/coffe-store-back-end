@@ -29,7 +29,13 @@ const userRoutes = require('./src/routes/users');
 const server = express();
 server.use(express.json({ limit: '50mb' }));
 server.use(express.urlencoded({ extended: true }));
-server.use(cors());
+server.use(
+  cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+  })
+);
 
 passport.use(passportLocalStrategy);
 passport.use(passportJWTStrategy);
